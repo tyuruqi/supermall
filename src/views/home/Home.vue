@@ -31,19 +31,18 @@
 </template>
 
 <script>
-import HomeSwiper from "./childComps/HomeSwiper";
-import RecommendView from "./childComps/RecommendView";
-import FeatureView from "./childComps/FeatureView";
+import HomeSwiper from "./childComponents/HomeSwiper";
+import RecommendView from "./childComponents/RecommendView";
+import FeatureView from "./childComponents/FeatureView";
 
 import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodsList from "components/content/goods/GoodsList";
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/content/backTop/BackTop";
 
 import {getHomeMultidata, getHomeGoods} from "network/home";
 
-import {debounce} from 'common/untils'
+import {itemListenerMixin, backTopMixin} from 'common/mixin'
 
 export default {
   name: "Home",
@@ -54,9 +53,9 @@ export default {
     NavBar,
     TabControl,
     GoodsList,
-    Scroll,
-    BackTop
+    Scroll
   },
+  mixins:[itemListenerMixin, backTopMixin],
   data(){
     return {
       banners: [],
@@ -90,12 +89,6 @@ export default {
       this.getHomeGoods('sell')
   },
   mounted() {
-    //1、监听item图片加载完成
-    const refresh =  debounce(this.$refs.scroll.refresh, 200)
-    this.$bus.$on('itemImgLoad', ()=>{
-      refresh()
-    })
-
 
   },
   deactivated() {
@@ -123,18 +116,6 @@ export default {
       }
       this.$refs.tabControl.currentIndex = index
       this.$refs.tabControlPlaceholder.currentIndex = index
-    },
-    //回到顶部
-    backTopClick(){
-      this.$refs.scroll.scrollTo(0,0,1000)    //500毫秒之内回到顶部
-    },
-    //是否显示backTop
-    contentScroll(position){
-      //判断backTop是否显示
-      this.isShowBackTop = -position.y > 1000
-
-      //决定tabControl是否吸顶
-      this.isTabControlShow = (-position.y) > this.tabOffsetTop
     },
     //加载更多
     loadMore(){
